@@ -51,6 +51,8 @@ export const getHospitals = async (req, res) => {
 export const getHospitalByCode = async (req, res) => {
     const { code } = req.body
     try {
+        if (!code)
+            return res.status(400).json({ message: "Hospital code is required" })
         const hospital = await hospital.findOne({ code: code })
         if (!hospital)
             return res.status(404).json({ message: "No hospital found with specified code" })
@@ -64,6 +66,8 @@ export const getHospitalByCode = async (req, res) => {
 export const blockHospitalAccount = async (req, res) => {
     const { code } = req.body
     try {
+        if (!code)
+            return res.status(400).json({ message: "Hospital code is required" })
         const existingHospital = await hospital.findOne({ code: code })
         if (!existingHospital)
             return res.status(400).json({ message: `No hospital with code ${code} was found` })
