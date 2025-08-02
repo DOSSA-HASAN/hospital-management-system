@@ -79,3 +79,33 @@ export const blockHospitalAccount = async (req, res) => {
         consoleError(req, 500, error.message)
     }
 }
+
+export const updateHospitalInfo = async (req, res) => {
+    const { code } = req.user
+    try {
+        if (!code)
+            return res.status(400).json({ message: "Missing hospital code" })
+        const updateData = []
+        const allowedFields = ["name", "location", "contactEmail", "phone"]
+        allowedFields.forEach((field) => {
+            if (req.body[field] !== undefined)
+                updateData[field] = req.body[field]
+        })
+        const updatedHospital = await hospital.findOneAndUpdate({ code, updateData, new: true, runValidators: true })
+        return res.status(200).json(updatedHospital)
+    } catch (error) {
+        console.log(`ERROR: ${error.message}`)
+        return res.status(500).json({ message: error.message })
+    }
+}
+
+// **FOR DEV ONLY**
+export const updateHospitalLegalIdNumber = async (req, res) => {
+    const { code, legalIdNumber } = req.body
+    try {
+        const hospitalExists = hospital.findOneAndUpdate({code, legalIdNumber})
+    } catch (error) {
+        console.log(`ERROR: ${error.message}`)
+        return res.status(500).json({ message: error.message })
+    }
+}
