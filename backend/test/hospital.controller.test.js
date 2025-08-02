@@ -1,6 +1,6 @@
 import mongoose from "mongoose"
 import request from "supertest"
-import { hospital } from "../models/hospital.model.js"
+import { Hospital } from "../models/hospital.model.js"
 import { app } from "../server.js"
 import { ConnectDB } from "../lib/dbConnetion.js"
 import jwt from "jsonwebtoken"
@@ -8,7 +8,7 @@ beforeAll(async () => {
     await ConnectDB()
 }, 20000)
 afterEach(async () => {
-    await hospital.deleteMany({})
+    await Hospital.deleteMany({})
 }, 20000)
 afterAll(async () => {
     await mongoose.connection.close()
