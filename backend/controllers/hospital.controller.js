@@ -1,5 +1,5 @@
 import { consoleError } from "../lib/logErrors.js"
-import { hospital } from "../models/hospital.model.js"
+import { Hospital } from "../models/hospital.model.js"
 
 // Function to register a new hospital
 // TODO: send email on sucess with one admin account created for this hospital
@@ -8,7 +8,7 @@ export const registerHospital = async (req, res) => {
     const { name, code, location, legalIdNumber, contactEmail, phone } = req.body
     try {
         // Check if there is a hospital registerd with the legalIdNumber
-        const hospitalExists = await hospital.findOne({
+        const hospitalExists = await Hospital.findOne({
             $or: [
                 { code: code },
                 { legalIdNumber: legalIdNumber },
@@ -19,7 +19,7 @@ export const registerHospital = async (req, res) => {
         if (hospitalExists) {
             return res.status(409).json({ message: "Hospital with Legal Id Number already exists." })
         }
-        const newHospital = await hospital.create({
+        const newHospital = await Hospital.create({
             name,
             code,
             location,
@@ -38,7 +38,7 @@ export const registerHospital = async (req, res) => {
 // **FOR DEV ONLY**
 export const getHospitals = async (req, res) => {
     try {
-        const hospitals = await hospital.find()
+        const hospitals = await Hospital.find()
         if (!hospitals)
             return res.status(404).json({ message: "No hospitals registered" })
         return res.status(200).json(hospitals)
@@ -53,7 +53,7 @@ export const getHospitalByCode = async (req, res) => {
     try {
         if (!code)
             return res.status(400).json({ message: "Hospital code is required" })
-        const hospital = await hospital.findOne({ code: code })
+        const hospital = await Hospital.findOne({ code: code })
         if (!hospital)
             return res.status(404).json({ message: "No hospital found with specified code" })
     } catch (error) {
@@ -68,7 +68,7 @@ export const blockHospitalAccount = async (req, res) => {
     try {
         if (!code)
             return res.status(400).json({ message: "Hospital code is required" })
-        const existingHospital = await hospital.findOne({ code: code })
+        const existingHospital = await Hospital.findOne({ code: code })
         if (!existingHospital)
             return res.status(400).json({ message: `No hospital with code ${code} was found` })
         existingHospital.isBlocked = true
@@ -91,7 +91,7 @@ export const updateHospitalInfo = async (req, res) => {
             if (req.body[field] !== undefined)
                 updateData[field] = req.body[field]
         })
-        const updatedHospital = await hospital.findOneAndUpdate({ code, updateData, new: true, runValidators: true })
+        const updatedHospital = await Hospital.findOneAndUpdate({ code, updateData, new: true, runValidators: true })
         return res.status(200).json(updatedHospital)
     } catch (error) {
         console.log(`ERROR: ${error.message}`)
@@ -103,7 +103,7 @@ export const updateHospitalInfo = async (req, res) => {
 export const updateHospitalLegalIdNumber = async (req, res) => {
     const { code, legalIdNumber } = req.body
     try {
-        const hospitalExists = hospital.findOneAndUpdate({code, legalIdNumber})
+        const hospitalExists = Hospital.findOneAndUpdate({code, legalIdNumber})
     } catch (error) {
         console.log(`ERROR: ${error.message}`)
         return res.status(500).json({ message: error.message })
